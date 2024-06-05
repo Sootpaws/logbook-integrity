@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use std::fs;
 
 fn main() {
-    match run(&mut std::env::args()) {
+    match run(&mut std::env::args().skip(1)) {
         Ok(_) => (),
         Err(message) => {
             eprintln!("Error: {message}");
