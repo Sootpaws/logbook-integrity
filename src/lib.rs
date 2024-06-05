@@ -2,12 +2,12 @@ use time::{Date, PrimitiveDateTime};
 
 /// A logbook of journal entries
 pub struct Logbook {
-    // The start position of this logbook
+    /// The start position of this logbook
     start: Mark,
-    // The end position (position of the last entry) of this logbook. None if
-    // this logbook is still being written
+    /// The end position (position of the last entry) of this logbook. None if
+    /// this logbook is still being written
     end: Option<Mark>,
-    // The entries in this logbook
+    /// The entries in this logbook
     entries: Vec<Entry>,
 }
 
@@ -15,7 +15,7 @@ pub struct Logbook {
 pub struct Mark {
     /// The date for which the entry was written
     effective_date: Date,
-    // The entry number of the entry
+    /// The entry number of the entry
     entry_number: u32,
 }
 
