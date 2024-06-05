@@ -20,6 +20,26 @@ fn run(args: &mut impl Iterator<Item = String>) -> Result<(), String> {
         |path_string| PathBuf::from(path_string)
     ).collect())?;
 
+    // Perform action
+    match action.as_ref().map(|s| s.as_str()) {
+        Some("help") => help(),
+        None => {
+            println!("No action given");
+            help()
+        },
+        _ => {
+            println!("Unrecognized action");
+            help()
+        },
+    }
+}
+
+/// Print the help message
+fn help() -> Result<(), String> {
+    println!("logbook-integrity v{}", env!("CARGO_PKG_VERSION"));
+    println!("Usage: logbook-integrity <action> [paths...]");
+    println!("Actions:");
+    println!("    help - print this message");
     Ok(())
 }
 
