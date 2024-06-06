@@ -72,6 +72,18 @@ impl Entry {
     ) -> Self {
         Self { position, started, finished, contents }
     }
+    pub fn position(&self) -> &Mark {
+        &self.position
+    }
+    pub fn started(&self) -> PrimitiveDateTime {
+        self.started
+    }
+    pub fn finished(&self) -> PrimitiveDateTime {
+        self.finished
+    }
+    pub fn contents(&self) -> &Vec<Block> {
+        &self.contents
+    }
 }
 
 impl Block {
