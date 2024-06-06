@@ -84,6 +84,10 @@ impl Entry {
     pub fn contents(&self) -> &Vec<Block> {
         &self.contents
     }
+    /// Get the recorded date of this entry
+    pub fn recorded_date(&self) -> Date {
+        self.started.date()
+    }
 }
 
 impl Block {
