@@ -1,3 +1,13 @@
+use time::Date;
+use time::macros::format_description;
+
+/// Parse a string into a date
+fn parse_date(string: &str, name: &str) -> Result<Date, String> {
+    Date::parse(
+        string,
+        format_description!("[month padding:none]/[day padding:none]/[year]")
+    ).map_err(|error| format!("bad {name} - {error}"))
+}
 
 /// Parse a string into a number
 fn parse_number(string: &str, name: &str) -> Result<u32, String> {
