@@ -1,5 +1,36 @@
 use time::Date;
 use time::macros::format_description;
+use crate::{Logbook, Mark};
+
+/// Parse the preable of a logbook, extracting the start and end marks
+fn parse_preamble(preable: &str) -> Result<(Mark, Option<Mark>), String> {
+    // Extract components
+    let mut words = preable
+        .split_once(ENTRY_RANGE_START)
+        .ok_or("no entry range found")?.1
+        .split_ascii_whitespace();
+    let start_date = expect_value(&mut words, "start date", "entry range")?;
+    expect_literal(&mut words, ENTRY_RANGE_MARK_SEPARATOR, "entry range start separatorr")?;
+    let start_number = expect_value(&mut words, "start entry number", "entry range")?;
+    expect_literal(&mut words, ENTRY_RANGE_SEPARATOR, "entry range separatorr")?;
+    let end_date = expect_value(&mut words, "end date", "entry range")?;
+    expect_literal(&mut words, ENTRY_RANGE_MARK_SEPARATOR, "entry range end separatorr")?;
+    let end_number = expect_value(&mut words, "end entry number", "entry range")?;
+    // Parse and structure marks
+    let start = Mark::new(
+        parse_date(start_date, "start date")?,
+        parse_number(start_number, "start entry number")?
+    );
+    let end = if end_number == ENTRY_RANGE_PLACEHOLDER {
+        None
+    } else {
+        Some(Mark::new(
+            parse_date(end_date, "end date")?,
+            parse_number(end_number, "end entry number")?
+        ))
+    };
+    Ok((start, end))
+}
 
 /// Separator between components (page boundaries, entries, page headers)
 const COMPONENT_SEPARATOR: &str = "\n\n";
