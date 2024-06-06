@@ -42,3 +42,32 @@ pub struct Block {
     /// The main text of this block
     text: String,
 }
+
+impl Logbook {
+    pub fn new(start: Mark, end: Option<Mark>, entries: Vec<Entry>) -> Self {
+        Self { start, end, entries }
+    }
+}
+
+impl Mark {
+    pub fn new(effective_date: Date, entry_number: u32) -> Self {
+        Self { effective_date, entry_number }
+    }
+}
+
+impl Entry {
+    pub fn new(
+        position: Mark,
+        started: PrimitiveDateTime,
+        finished: PrimitiveDateTime,
+        contents: Vec<Block>
+    ) -> Self {
+        Self { position, started, finished, contents }
+    }
+}
+
+impl Block {
+    pub fn new(subject: String, text: String) -> Self {
+        Self { subject, text }
+    }
+}
