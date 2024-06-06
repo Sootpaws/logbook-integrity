@@ -9,13 +9,13 @@ fn parse_preamble(preable: &str) -> Result<(Mark, Option<Mark>), String> {
         .split_once(ENTRY_RANGE_START)
         .ok_or("no entry range found")?.1
         .split_ascii_whitespace();
-    let start_date = expect_value(&mut words, "start date", "entry range")?;
-    expect_literal(&mut words, ENTRY_RANGE_MARK_SEPARATOR, "entry range start separatorr")?;
-    let start_number = expect_value(&mut words, "start entry number", "entry range")?;
-    expect_literal(&mut words, ENTRY_RANGE_SEPARATOR, "entry range separatorr")?;
-    let end_date = expect_value(&mut words, "end date", "entry range")?;
-    expect_literal(&mut words, ENTRY_RANGE_MARK_SEPARATOR, "entry range end separatorr")?;
-    let end_number = expect_value(&mut words, "end entry number", "entry range")?;
+    let start_date = expect_value(words.next(), "start date", "entry range")?;
+    expect_literal(words.next(), ENTRY_RANGE_MARK_SEPARATOR, "entry range start separator")?;
+    let start_number = expect_value(words.next(), "start entry number", "entry range")?;
+    expect_literal(words.next(), ENTRY_RANGE_SEPARATOR, "entry range separator")?;
+    let end_date = expect_value(words.next(), "end date", "entry range")?;
+    expect_literal(words.next(), ENTRY_RANGE_MARK_SEPARATOR, "entry range end separator")?;
+    let end_number = expect_value(words.next(), "end entry number", "entry range")?;
     // Parse and structure marks
     let start = Mark::new(
         parse_date(start_date, "start date")?,
@@ -66,21 +66,21 @@ fn parse_number(string: &str, name: &str) -> Result<u32, String> {
 
 /// Return the next item of an iterator, or an error if there is none
 fn expect_value<'a>(
-    source: &mut impl Iterator<Item = &'a str>,
+    source: Option<&'a str>,
     name: &str,
     location: &str
 ) -> Result<&'a str, String> {
-    source.next().ok_or(format!("no {name} in {location}"))
+    source.ok_or(format!("no {name} in {location}"))
 }
 
 /// Expect a value as the next item of an iterator, returning an error if it
 /// doesn't match
 fn expect_literal<'a>(
-    source: &mut impl Iterator<Item = &'a str>,
+    source: Option<&'a str>,
     value: &str,
     name: &str,
 ) -> Result<(), String> {
-    match source.next() {
+    match source {
         Some(next) if next == value => Ok(()),
         Some(other) => Err(format!("got {other} for {other}, expected {value}")),
         None => Err(format!("no {name}, expected {value}")),
