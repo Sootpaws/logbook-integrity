@@ -1,5 +1,7 @@
 use time::{Date, PrimitiveDateTime};
 
+pub mod parse;
+
 /// A logbook of journal entries
 #[derive(Debug)]
 pub struct Logbook {
