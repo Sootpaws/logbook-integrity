@@ -15,7 +15,7 @@ pub struct Logbook {
 }
 
 /// A position within a sequence of entries
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Mark {
     /// The date for which the entry was written
     effective_date: Date,
