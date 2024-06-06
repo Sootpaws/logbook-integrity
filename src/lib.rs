@@ -1,6 +1,7 @@
 use time::{Date, PrimitiveDateTime};
 
 /// A logbook of journal entries
+#[derive(Debug)]
 pub struct Logbook {
     /// The start position of this logbook
     start: Mark,
@@ -12,6 +13,7 @@ pub struct Logbook {
 }
 
 /// A position within a sequence of entries
+#[derive(Debug)]
 pub struct Mark {
     /// The date for which the entry was written
     effective_date: Date,
@@ -20,6 +22,7 @@ pub struct Mark {
 }
 
 /// An entry in a logbook
+#[derive(Debug)]
 pub struct Entry {
     /// The position of this entry
     position: Mark,
@@ -32,6 +35,7 @@ pub struct Entry {
 }
 
 /// One block of an entry's body
+#[derive(Debug)]
 pub struct Block {
     /// The subject of this block
     subject: String,
