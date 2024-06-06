@@ -55,6 +55,12 @@ impl Mark {
     pub fn new(effective_date: Date, entry_number: u32) -> Self {
         Self { effective_date, entry_number }
     }
+    pub fn effective_date(&self) -> Date {
+        self.effective_date
+    }
+    pub fn entry_number(&self) -> u32 {
+        self.entry_number
+    }
 }
 
 impl Entry {
