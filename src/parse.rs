@@ -39,7 +39,7 @@ const COMPONENT_SEPARATOR: &str = "\n\n";
 const PAGE_MARKER: &str = "-----";
 
 /// Start of the preamble entry rage
-const ENTRY_RANGE_START: &str = "Entries from ";
+const ENTRY_RANGE_START: &str = "Entries from";
 
 /// Separator between the date and entry number of the preamble entry range
 const ENTRY_RANGE_MARK_SEPARATOR: &str = "-";
