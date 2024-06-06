@@ -82,7 +82,7 @@ fn expect_literal<'a>(
 ) -> Result<(), String> {
     match source {
         Some(next) if next == value => Ok(()),
-        Some(other) => Err(format!("got {other} for {other}, expected {value}")),
+        Some(other) => Err(format!("got {other} for {name}, expected {value}")),
         None => Err(format!("no {name}, expected {value}")),
     }
 }
