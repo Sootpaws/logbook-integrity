@@ -2,6 +2,27 @@ use time::{Date, Time, PrimitiveDateTime, Duration};
 use time::macros::format_description;
 use crate::{Logbook, Mark, Entry, Block};
 
+/// Parse a logbook
+pub fn parse(logbook: &str) -> Result<Logbook, String> {
+    // Extract the first page of the logbook
+    let (preamble, entries) = logbook
+        .split_once(&(PAGE_MARKER.to_owned() + COMPONENT_SEPARATOR))
+        .ok_or("Could not parse preamble - no page boundry markers")?;
+    // Parse the preamble
+    let (start, end) = parse_preamble(preamble)
+        .map_err(|error| format!("Could not parse preamble - {error}"))?;
+    // Parse the entries
+    let (entries, errors) = entries
+        .split(COMPONENT_SEPARATOR)
+        .fold(EntryParser::new(start.clone()), |parser, chunk| parser.advance(chunk))
+        .finish(end.clone());
+    // Print parsing errors
+    for error in errors {
+        eprintln!("Parsing error: {error}\n");
+    }
+    Ok(Logbook::new(start, end, entries))
+}
+
 /// Parse the preable of a logbook, extracting the start and end marks
 fn parse_preamble(preable: &str) -> Result<(Mark, Option<Mark>), String> {
     // Extract components
