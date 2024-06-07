@@ -58,6 +58,14 @@ fn parse_date(string: &str, name: &str) -> Result<Date, String> {
     ).map_err(|error| format!("bad {name} - {error}"))
 }
 
+/// Parse a string into a time
+fn parse_time(string: &str, name: &str) -> Result<Time, String> {
+    Time::parse(
+        string,
+        format_description!("[hour padding:none repr:12]:[minute padding:none] [period]")
+    ).map_err(|error| format!("bad {name} - {error}"))
+}
+
 /// Parse a string into a number
 fn parse_number(string: &str, name: &str) -> Result<u32, String> {
     u32::from_str_radix(string, 10)
