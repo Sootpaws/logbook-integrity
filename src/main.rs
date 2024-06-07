@@ -1,5 +1,6 @@
-use std::path::PathBuf;
 use std::fs;
+use std::path::PathBuf;
+use logbook_integrity::parse;
 
 fn main() {
     match run(&mut std::env::args().skip(1)) {
@@ -23,6 +24,10 @@ fn run(args: &mut impl Iterator<Item = String>) -> Result<(), String> {
     // Perform action
     match action.as_ref().map(|s| s.as_str()) {
         Some("help") => help(),
+        Some("validate") => {
+            let _ = parse::parse_files(paths)?;
+            Ok(())
+        }
         None => {
             println!("No action given");
             help()
