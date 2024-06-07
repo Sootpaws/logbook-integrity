@@ -24,7 +24,7 @@ pub struct Mark {
 }
 
 /// An entry in a logbook
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Entry {
     /// The position of this entry
     position: Mark,
@@ -37,7 +37,7 @@ pub struct Entry {
 }
 
 /// One block of an entry's body
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Block {
     /// The subject of this block
     subject: String,
