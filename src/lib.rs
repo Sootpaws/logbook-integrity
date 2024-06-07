@@ -97,4 +97,10 @@ impl Block {
     pub fn new(subject: String, text: String) -> Self {
         Self { subject, text }
     }
+    pub fn subject(&self) -> &String {
+        &self.subject
+    }
+    pub fn text(&self) -> &String {
+        &self.text
+    }
 }
