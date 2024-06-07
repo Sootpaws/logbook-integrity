@@ -38,6 +38,30 @@ const COMPONENT_SEPARATOR: &str = "\n\n";
 /// Page boundary marker
 const PAGE_MARKER: &str = "-----";
 
+/// Page header split between date and number range
+const PAGE_RANGE_SPLIT: &str = "\n";
+
+/// Page header date and number separator
+const PAGE_RANGE_SEPARATOR: &str = "-";
+
+/// Entry header start
+const HEADER_START: &str = "Entry";
+
+/// Separator between entry number and date in entry header
+const HEADER_POST_NUMBER: &str = ":";
+
+/// Separator between entry date and start time in entry header
+const HEADER_STARTED: &str = "started";
+
+/// Separator between entry start and finished time in entry header
+const HEADER_FINISHED: &str = "finished";
+
+/// Prefix for the subject lines of an entry
+const SUBJECT_PREFIX: &str = "    ";
+
+/// Marker for multi-page entries
+const MULTI_PAGE: &str = "(->)";
+
 /// Start of the preamble entry rage
 const ENTRY_RANGE_START: &str = "Entries from";
 
