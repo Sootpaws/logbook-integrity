@@ -1,6 +1,21 @@
+use std::path::PathBuf;
 use time::{Date, Time, PrimitiveDateTime, Duration};
 use time::macros::format_description;
 use crate::{Logbook, Mark, Entry, Block};
+
+/// Parse a series of files
+pub fn parse_files(files: Vec<PathBuf>) -> Result<Vec<Logbook>, String> {
+    files.into_iter()
+        .map(|file| std::fs::read_to_string(&file).map_err(
+            |error| format!("Could not read file {}: {}", file.display(), error),
+        ).map(|text| (file, text)))
+        .collect::<Result<Vec<_>, _>>()?
+        .into_iter()
+        .map(|(file, text)| parse(&text).map_err(
+            |error| format!("{}\nwhile parsing file {}", error, file.display())
+        ))
+        .collect()
+}
 
 /// Parse a logbook
 pub fn parse(logbook: &str) -> Result<Logbook, String> {
