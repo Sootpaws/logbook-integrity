@@ -50,6 +50,10 @@ const ENTRY_RANGE_SEPARATOR: &str = "to";
 /// Placeholder for the ending entry number of the preamble entry range
 const ENTRY_RANGE_PLACEHOLDER: &str = "_";
 
+/// Hour before which an entry will be considered as being written on the
+/// previous day
+const NEXT_DAY: u8 = 6;
+
 /// Parse a string into a date
 fn parse_date(string: &str, name: &str) -> Result<Date, String> {
     Date::parse(
