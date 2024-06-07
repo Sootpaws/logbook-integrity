@@ -341,6 +341,10 @@ impl EntryParser {
                         .text_mut().push_str(line);
                 }
             }
+            if !self.multi_page_flag {
+                // Finish recording this entry
+                self.read_entries.push(self.current_entry.clone());
+            }
         }
         Ok(())
     }
