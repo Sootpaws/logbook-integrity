@@ -75,8 +75,14 @@ impl Entry {
     pub fn position(&self) -> &Mark {
         &self.position
     }
+    pub fn set_position(&mut self, position: Mark) {
+        self.position = position;
+    }
     pub fn started(&self) -> PrimitiveDateTime {
         self.started
+    }
+    pub fn set_started(&mut self, started: PrimitiveDateTime) {
+        self.started = started;
     }
     pub fn finished(&self) -> PrimitiveDateTime {
         self.finished
