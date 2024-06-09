@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 use time::{Date, Time, PrimitiveDateTime, Duration};
-use time::macros::format_description;
+use time::macros::{format_description, time};
 use crate::{Logbook, Mark, Entry, Block};
 
 /// Parse a series of files
@@ -221,6 +221,13 @@ impl EntryParser {
                     expected_here.effective_date() + Duration::DAY,
                     expected_here.entry_number() + 1
                 );
+                // Be generous and assume that this entry had the right position
+                // when checking page headers if parsing fails
+                self.current_entry.set_position(expected_here.clone());
+                self.current_entry.set_started(PrimitiveDateTime::new(
+                    expected_here.effective_date(),
+                    time!(9 pm),
+                ));
                 // Get the header
                 let mut header = lines.next().ok_or("entry has no header")?.split(" ");
                 // Extract components
