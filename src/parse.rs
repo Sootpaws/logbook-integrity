@@ -250,7 +250,7 @@ impl EntryParser {
                 let entry_number = parse_number(number, "entry number")?;
                 let start_date = parse_date(start_date, "entry date")?;
                 let start_time = parse_time(&format!("{} {}", start_time, start_period), "entry start time")?;
-                let end_time = parse_time(&format!("{} {}", end_time, end_period), "entry start time")?;
+                let end_time = parse_time(&format!("{} {}", end_time, end_period), "entry end time")?;
                 // Calculate end timestamp and effective entry date
                 let start = PrimitiveDateTime::new(start_date, start_time);
                 let end_date = if start_time < end_time {
