@@ -215,6 +215,12 @@ impl EntryParser {
             let mut lines = chunk.lines();
             // Don't look for a header if we are continuing a mult-page entry
             if !self.multi_page_flag {
+                // Extrapolate the next expected entry mark
+                let expected_here = self.next_entry_position.clone();
+                self.next_entry_position = Mark::new(
+                    expected_here.effective_date() + Duration::DAY,
+                    expected_here.entry_number() + 1
+                );
                 // Get the header
                 let mut header = lines.next().ok_or("entry has no header")?.split(" ");
                 // Extract components
@@ -262,28 +268,30 @@ impl EntryParser {
                 // Calculate the next expected entry position
                 let expected_next = Mark::new(date + Duration::DAY, entry_number + 1);
                 // Check that this entry has the expected position
-                if self.next_entry_position.effective_date() != position.effective_date() {
-                    if self.next_entry_position.effective_date() + Duration::DAY == position.effective_date() {
+                if expected_here.effective_date() != position.effective_date() {
+                    if expected_here.effective_date() + Duration::DAY == position.effective_date() {
                         self.error(format!(
                             "Missing entry for {}",
-                            self.next_entry_position.effective_date(),
+                            expected_here.effective_date(),
                         ));
                     } else {
                         self.error(format!(
                             "Expected {} for effective date, got {}",
-                            self.next_entry_position.effective_date(),
+                            expected_here.effective_date(),
                             position.effective_date(),
                         ));
                     }
                 }
-                if self.next_entry_position.entry_number() != position.entry_number() {
+                if expected_here.entry_number() != position.entry_number() {
                     self.error(format!(
                         "Expected {} for entry number, got {}",
-                        self.next_entry_position.entry_number(),
+                        expected_here.entry_number(),
                         position.entry_number(),
                     ));
                 }
-                // Update the next expected entry position
+                // Update the next expected entry position. This should be the
+                // same as the extrapolated version, but may be different in the
+                // case of a missed entry
                 self.next_entry_position = expected_next;
                 // Start recording the new entry
                 self.current_entry = Entry::new(position, start, end, Vec::new());
