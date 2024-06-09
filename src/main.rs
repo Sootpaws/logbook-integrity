@@ -45,6 +45,7 @@ fn help() -> Result<(), String> {
     println!("Usage: logbook-integrity <action> [paths...]");
     println!("Actions:");
     println!("    help - print this message");
+    println!("    validate - read in the logbook files, checking them for metadata errors");
     Ok(())
 }
 
