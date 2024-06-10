@@ -345,7 +345,7 @@ impl EntryParser {
                     // Check for a new multi-page marker
                     let line = if let Some(line) = line.strip_suffix(&format!(
                         " {}", MULTI_PAGE
-                    )) {
+                    )).or_else(|| line.strip_suffix(MULTI_PAGE)) {
                         // This is a multi-page entry
                         self.multi_page_flag = true;
                         line
