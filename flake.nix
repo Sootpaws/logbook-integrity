@@ -1,5 +1,5 @@
 {
-    description = "A command-line tool for validating journal entries";
+    description = "A command-line tool for parsing and validating journal entries";
 
     inputs = {
         nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
