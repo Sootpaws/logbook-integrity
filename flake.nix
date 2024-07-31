@@ -9,10 +9,11 @@
     outputs = { self, nixpkgs, flake-utils }:
         flake-utils.lib.eachDefaultSystem (system: let
             pkgs = nixpkgs.legacyPackages.${system};
+            cargo_manifest = builtins.fromTOML (builtins.readFile ./Cargo.toml);
         in {
             defaultPackage = pkgs.rustPlatform.buildRustPackage {
-                pname = "logbook-integrity";
-                version = "0.1.0";
+                pname = cargo_manifest.package.name;
+                version = cargo_manifest.package.version;
                 src = ./.;
                 cargoLock.lockFile = ./Cargo.lock;
             };
