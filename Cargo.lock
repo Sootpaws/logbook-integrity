@@ -13,7 +13,7 @@ dependencies = [
 
 [[package]]
 name = "logbook-integrity"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "time",
 ]
