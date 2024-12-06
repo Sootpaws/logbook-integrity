@@ -1,19 +1,23 @@
+use crate::{Block, Entry, Logbook, Mark};
 use std::path::PathBuf;
-use time::{Date, Time, PrimitiveDateTime, Duration};
 use time::macros::{format_description, time};
-use crate::{Logbook, Mark, Entry, Block};
+use time::{Date, Duration, PrimitiveDateTime, Time};
 
 /// Parse a series of files
 pub fn parse_files(files: Vec<PathBuf>) -> Result<Vec<Logbook>, String> {
-    files.into_iter()
-        .map(|file| std::fs::read_to_string(&file).map_err(
-            |error| format!("Could not read file {}: {}", file.display(), error),
-        ).map(|text| (file, text)))
+    files
+        .into_iter()
+        .map(|file| {
+            std::fs::read_to_string(&file)
+                .map_err(|error| format!("Could not read file {}: {}", file.display(), error))
+                .map(|text| (file, text))
+        })
         .collect::<Result<Vec<_>, _>>()?
         .into_iter()
-        .map(|(file, text)| parse(&text).map_err(
-            |error| format!("{}\nwhile parsing file {}", error, file.display())
-        ))
+        .map(|(file, text)| {
+            parse(&text)
+                .map_err(|error| format!("{}\nwhile parsing file {}", error, file.display()))
+        })
         .collect()
 }
 
@@ -24,12 +28,14 @@ pub fn parse(logbook: &str) -> Result<Logbook, String> {
         .split_once(&(PAGE_MARKER.to_owned() + COMPONENT_SEPARATOR))
         .ok_or("Could not parse preamble - no page boundry markers")?;
     // Parse the preamble
-    let (start, end) = parse_preamble(preamble)
-        .map_err(|error| format!("Could not parse preamble - {error}"))?;
+    let (start, end) =
+        parse_preamble(preamble).map_err(|error| format!("Could not parse preamble - {error}"))?;
     // Parse the entries
     let (entries, errors) = entries
         .split(COMPONENT_SEPARATOR)
-        .fold(EntryParser::new(start.clone()), |parser, chunk| parser.advance(chunk))
+        .fold(EntryParser::new(start.clone()), |parser, chunk| {
+            parser.advance(chunk)
+        })
         .finish(end.clone());
     // Print parsing errors
     for error in errors {
@@ -43,26 +49,35 @@ fn parse_preamble(preable: &str) -> Result<(Mark, Option<Mark>), String> {
     // Extract components
     let mut words = preable
         .split_once(ENTRY_RANGE_START)
-        .ok_or("no entry range found")?.1
+        .ok_or("no entry range found")?
+        .1
         .split_ascii_whitespace();
     let start_date = expect_value(words.next(), "start date", "entry range")?;
-    expect_literal(words.next(), ENTRY_RANGE_MARK_SEPARATOR, "entry range start separator")?;
+    expect_literal(
+        words.next(),
+        ENTRY_RANGE_MARK_SEPARATOR,
+        "entry range start separator",
+    )?;
     let start_number = expect_value(words.next(), "start entry number", "entry range")?;
     expect_literal(words.next(), ENTRY_RANGE_SEPARATOR, "entry range separator")?;
     let end_date = expect_value(words.next(), "end date", "entry range")?;
-    expect_literal(words.next(), ENTRY_RANGE_MARK_SEPARATOR, "entry range end separator")?;
+    expect_literal(
+        words.next(),
+        ENTRY_RANGE_MARK_SEPARATOR,
+        "entry range end separator",
+    )?;
     let end_number = expect_value(words.next(), "end entry number", "entry range")?;
     // Parse and structure marks
     let start = Mark::new(
         parse_date(start_date, "start date")?,
-        parse_number(start_number, "start entry number")?
+        parse_number(start_number, "start entry number")?,
     );
     let end = if end_number == ENTRY_RANGE_PLACEHOLDER {
         None
     } else {
         Some(Mark::new(
             parse_date(end_date, "end date")?,
-            parse_number(end_number, "end entry number")?
+            parse_number(end_number, "end entry number")?,
         ))
     };
     Ok((start, end))
@@ -94,7 +109,7 @@ impl EntryParser {
                 Mark::new(Date::MIN, 0),
                 PrimitiveDateTime::MIN,
                 PrimitiveDateTime::MIN,
-                Vec::new()
+                Vec::new(),
             ),
             multi_page_flag: false,
             page_header_expectations: PageHeaderExpectations::NewHeader,
@@ -125,7 +140,7 @@ impl EntryParser {
                 }
             } else {
                 self.error(
-                    "an end entry was specified but the logbook contains no entries".to_string()
+                    "an end entry was specified but the logbook contains no entries".to_string(),
                 );
             }
         }
@@ -134,7 +149,10 @@ impl EntryParser {
 
     /// Attempt to advance the parser
     fn try_advance(&mut self, chunk: &str) -> Result<(), String> {
-        if matches!(self.page_header_expectations, PageHeaderExpectations::NewHeader) {
+        if matches!(
+            self.page_header_expectations,
+            PageHeaderExpectations::NewHeader
+        ) {
             // The previous page just ended, read in the new header
             // We haven't looked at the new header yet, just assume
             // it's broken for now
@@ -160,10 +178,10 @@ impl EntryParser {
             // The current page is ending, check the page header's end against
             // the previous entry
             match self.page_header_expectations {
-                PageHeaderExpectations::NewHeader =>
-                    Err("expected page header, got page break"),
-                PageHeaderExpectations::StartAndEnd { .. } =>
-                    Err("expected at least one entry after page header, got page break"),
+                PageHeaderExpectations::NewHeader => Err("expected page header, got page break"),
+                PageHeaderExpectations::StartAndEnd { .. } => {
+                    Err("expected at least one entry after page header, got page break")
+                }
                 PageHeaderExpectations::End {
                     end_recorded_date,
                     end_number,
@@ -194,8 +212,7 @@ impl EntryParser {
             // If this is the first entry of the page, get the expected entry
             // number and date from the page header
             let page_header_expectations = match self.page_header_expectations {
-                PageHeaderExpectations::NewHeader =>
-                    Err("expected page header, got entry"),
+                PageHeaderExpectations::NewHeader => Err("expected page header, got entry"),
                 PageHeaderExpectations::StartAndEnd {
                     start_recorded_date,
                     start_number,
@@ -219,7 +236,7 @@ impl EntryParser {
                 let expected_here = self.next_entry_position.clone();
                 self.next_entry_position = Mark::new(
                     expected_here.effective_date() + Duration::DAY,
-                    expected_here.entry_number() + 1
+                    expected_here.entry_number() + 1,
                 );
                 // Be generous and assume that this entry had the right position
                 // when checking page headers if parsing fails
@@ -231,26 +248,44 @@ impl EntryParser {
                 // Get the header
                 let mut header = lines.next().ok_or("entry has no header")?.split(" ");
                 // Extract components
-                self.record(expect_literal(header.next(), HEADER_START, "entry header start"));
+                self.record(expect_literal(
+                    header.next(),
+                    HEADER_START,
+                    "entry header start",
+                ));
                 let number = expect_value(header.next(), "entry number", "entry header")?;
                 let number = number
                     .strip_suffix(HEADER_POST_NUMBER)
                     .ok_or("missing separator between entry number and date in entry header")?;
                 let start_date = expect_value(header.next(), "entry date", "entry header")?;
-                self.record(expect_literal(header.next(), HEADER_STARTED, "entry header started"));
+                self.record(expect_literal(
+                    header.next(),
+                    HEADER_STARTED,
+                    "entry header started",
+                ));
                 let start_time = expect_value(header.next(), "entry started time", "entry header")?;
-                let start_period = expect_value(header.next(), "entry started period", "entry header")?;
-                self.record(expect_literal(header.next(), HEADER_FINISHED, "entry header finished"));
+                let start_period =
+                    expect_value(header.next(), "entry started period", "entry header")?;
+                self.record(expect_literal(
+                    header.next(),
+                    HEADER_FINISHED,
+                    "entry header finished",
+                ));
                 let end_time = expect_value(header.next(), "entry finished time", "entry header")?;
-                let end_period = expect_value(header.next(), "entry finished period", "entry header")?;
+                let end_period =
+                    expect_value(header.next(), "entry finished period", "entry header")?;
                 if let Some(extra) = header.next() {
                     self.error(format!("Unexpected text after entry header: {extra}"));
                 }
                 // Parse and structure values
                 let entry_number = parse_number(number, "entry number")?;
                 let start_date = parse_date(start_date, "entry date")?;
-                let start_time = parse_time(&format!("{} {}", start_time, start_period), "entry start time")?;
-                let end_time = parse_time(&format!("{} {}", end_time, end_period), "entry end time")?;
+                let start_time = parse_time(
+                    &format!("{} {}", start_time, start_period),
+                    "entry start time",
+                )?;
+                let end_time =
+                    parse_time(&format!("{} {}", end_time, end_period), "entry end time")?;
                 // Calculate end timestamp and effective entry date
                 let start = PrimitiveDateTime::new(start_date, start_time);
                 let end_date = if start_time < end_time {
@@ -328,32 +363,40 @@ impl EntryParser {
                         self.error("continuation of multi-page entry started with a new subject line instead of a continuation marker".to_owned());
                         self.multi_page_flag = false;
                     }
-                    self.current_entry.contents_mut().push(Block::new(
-                        subject.to_owned(), String::new()
-                    ));
+                    self.current_entry
+                        .contents_mut()
+                        .push(Block::new(subject.to_owned(), String::new()));
                 } else {
                     // Check for a continuation marker
                     let line = if self.multi_page_flag {
-                        if let Some(line) = line.strip_prefix(&format!(
-                            "{} ", MULTI_PAGE
-                        )) { line } else {
+                        if let Some(line) = line.strip_prefix(&format!("{} ", MULTI_PAGE)) {
+                            line
+                        } else {
                             self.error("no continuation marker after multi-page split".to_owned());
                             line
                         }
-                    } else { line };
+                    } else {
+                        line
+                    };
                     self.multi_page_flag = false;
                     // Check for a new multi-page marker
-                    let line = if let Some(line) = line.strip_suffix(&format!(
-                        " {}", MULTI_PAGE
-                    )).or_else(|| line.strip_suffix(MULTI_PAGE)) {
+                    let line = if let Some(line) = line
+                        .strip_suffix(&format!(" {}", MULTI_PAGE))
+                        .or_else(|| line.strip_suffix(MULTI_PAGE))
+                    {
                         // This is a multi-page entry
                         self.multi_page_flag = true;
                         line
-                    } else { line };
+                    } else {
+                        line
+                    };
                     // Add the line to the current block
-                    self.current_entry.contents_mut()
-                        .last_mut().ok_or("no subject line")?
-                        .text_mut().push_str(line);
+                    self.current_entry
+                        .contents_mut()
+                        .last_mut()
+                        .ok_or("no subject line")?
+                        .text_mut()
+                        .push_str(line);
                 }
             }
             if !self.multi_page_flag {
@@ -458,39 +501,39 @@ const NEXT_DAY: u8 = 6;
 fn parse_date(string: &str, name: &str) -> Result<Date, String> {
     Date::parse(
         string,
-        format_description!("[month padding:none]/[day padding:none]/[year]")
-    ).map_err(|error| format!("bad {name} - {error}"))
+        format_description!("[month padding:none]/[day padding:none]/[year]"),
+    )
+    .map_err(|error| format!("bad {name} - {error}"))
 }
 
 /// Parse a string into a time
 fn parse_time(string: &str, name: &str) -> Result<Time, String> {
     Time::parse(
         string,
-        format_description!("[hour padding:none repr:12]:[minute padding:none] [period]")
-    ).map_err(|error| format!("bad {name} - {error}"))
+        format_description!("[hour padding:none repr:12]:[minute padding:none] [period]"),
+    )
+    .map_err(|error| format!("bad {name} - {error}"))
 }
 
 /// Parse a string into a number
 fn parse_number(string: &str, name: &str) -> Result<u32, String> {
-    string.parse::<u32>().map_err(|error| format!("bad {name} - {error}"))
+    string
+        .parse::<u32>()
+        .map_err(|error| format!("bad {name} - {error}"))
 }
 
 /// Return the next item of an iterator, or an error if there is none
 fn expect_value<'a>(
     source: Option<&'a str>,
     name: &str,
-    location: &str
+    location: &str,
 ) -> Result<&'a str, String> {
     source.ok_or(format!("no {name} in {location}"))
 }
 
 /// Expect a value as the next item of an iterator, returning an error if it
 /// doesn't match
-fn expect_literal(
-    source: Option<&str>,
-    value: &str,
-    name: &str,
-) -> Result<(), String> {
+fn expect_literal(source: Option<&str>, value: &str, name: &str) -> Result<(), String> {
     match source {
         Some(next) if next == value => Ok(()),
         Some(other) => Err(format!("got {other} for {name}, expected {value}")),

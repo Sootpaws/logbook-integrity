@@ -29,11 +29,11 @@ fn run(args: &mut impl Iterator<Item = String>) -> Result<(), String> {
         None => {
             println!("No action given");
             help()
-        },
+        }
         _ => {
             println!("Unrecognized action");
             help()
-        },
+        }
     }
 }
 
@@ -49,24 +49,23 @@ fn help() -> Result<(), String> {
 
 /// Expand a series of paths by recursing into directories
 fn expand_paths(paths: Vec<PathBuf>) -> Result<Vec<PathBuf>, String> {
-    paths.into_iter().map(|path| {
-        match fs::metadata(&path) {
-            Ok(metadata) => if metadata.is_dir() {
-                expand_paths(
-                    fs::read_dir(path)
-                        .unwrap()
-                        .map(|entry| entry.unwrap().path())
-                        .collect()
-                )
-            } else {
-                Ok(vec![path])
+    paths
+        .into_iter()
+        .map(|path| match fs::metadata(&path) {
+            Ok(metadata) => {
+                if metadata.is_dir() {
+                    expand_paths(
+                        fs::read_dir(path)
+                            .unwrap()
+                            .map(|entry| entry.unwrap().path())
+                            .collect(),
+                    )
+                } else {
+                    Ok(vec![path])
+                }
             }
-            Err(error) => Err(format!(
-                "Could not read path {}: {}",
-                path.display(),
-                error
-            )),
-        }
-    }).collect::<Result<Vec<_>, _>>()
+            Err(error) => Err(format!("Could not read path {}: {}", path.display(), error)),
+        })
+        .collect::<Result<Vec<_>, _>>()
         .map(|paths| paths.into_iter().flatten().collect())
 }
