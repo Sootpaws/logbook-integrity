@@ -391,12 +391,16 @@ impl EntryParser {
                         line
                     };
                     // Add the line to the current block
-                    self.current_entry
+                    let block = self
+                        .current_entry
                         .contents_mut()
                         .last_mut()
                         .ok_or("no subject line")?
-                        .text_mut()
-                        .push_str(line);
+                        .text_mut();
+                    if !block.is_empty() {
+                        block.push(' ');
+                    }
+                    block.push_str(line);
                 }
             }
             if !self.multi_page_flag {
