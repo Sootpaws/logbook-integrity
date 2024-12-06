@@ -17,12 +17,10 @@ fn run(args: &mut impl Iterator<Item = String>) -> Result<(), String> {
     let action = args.next();
 
     // Get input paths
-    let paths = expand_paths(args.map(
-        |path_string| PathBuf::from(path_string)
-    ).collect())?;
+    let paths = expand_paths(args.map(PathBuf::from).collect())?;
 
     // Perform action
-    match action.as_ref().map(|s| s.as_str()) {
+    match action.as_deref() {
         Some("help") => help(),
         Some("validate") => {
             let _ = parse::parse_files(paths)?;

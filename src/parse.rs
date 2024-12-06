@@ -472,8 +472,7 @@ fn parse_time(string: &str, name: &str) -> Result<Time, String> {
 
 /// Parse a string into a number
 fn parse_number(string: &str, name: &str) -> Result<u32, String> {
-    u32::from_str_radix(string, 10)
-        .map_err(|error| format!("bad {name} - {error}"))
+    string.parse::<u32>().map_err(|error| format!("bad {name} - {error}"))
 }
 
 /// Return the next item of an iterator, or an error if there is none
@@ -487,8 +486,8 @@ fn expect_value<'a>(
 
 /// Expect a value as the next item of an iterator, returning an error if it
 /// doesn't match
-fn expect_literal<'a>(
-    source: Option<&'a str>,
+fn expect_literal(
+    source: Option<&str>,
     value: &str,
     name: &str,
 ) -> Result<(), String> {
