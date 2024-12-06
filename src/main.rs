@@ -1,6 +1,6 @@
+use logbook_integrity::{markov, parse};
 use std::fs;
 use std::path::PathBuf;
-use logbook_integrity::parse;
 
 fn main() {
     match run(&mut std::env::args().skip(1)) {
@@ -26,6 +26,12 @@ fn run(args: &mut impl Iterator<Item = String>) -> Result<(), String> {
             let _ = parse::parse_files(paths)?;
             Ok(())
         }
+        Some("markov") => {
+            let parsed = parse::parse_files(paths)?;
+            let chain = markov::chain_from_logs(&parsed);
+            dbg!(chain);
+            Ok(())
+        }
         None => {
             println!("No action given");
             help()
@@ -44,6 +50,7 @@ fn help() -> Result<(), String> {
     println!("Actions:");
     println!("    help - print this message");
     println!("    validate - read in the logbook files, checking them for metadata errors");
+    println!("    markov - use the logbook files to create a Markov chain, and generate some text");
     Ok(())
 }
 

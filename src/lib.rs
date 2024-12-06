@@ -1,5 +1,6 @@
 use time::{Date, PrimitiveDateTime};
 
+pub mod markov;
 pub mod parse;
 
 /// A logbook of journal entries
