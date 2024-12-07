@@ -29,7 +29,8 @@ fn run(args: &mut impl Iterator<Item = String>) -> Result<(), String> {
         Some("markov") => {
             let parsed = parse::parse_files(paths)?;
             let chain = markov::chain_from_logs(&parsed);
-            dbg!(chain);
+            let generated = chain.generate(["", ""]);
+            println!("{}", generated);
             Ok(())
         }
         None => {

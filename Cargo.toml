@@ -5,4 +5,5 @@ description = "A command-line tool for parsing and validating journal entries"
 edition = "2021"
 
 [dependencies]
+rand = "0.8.5"
 time = { version = "0.3.36", features = [ "macros", "parsing" ] }
