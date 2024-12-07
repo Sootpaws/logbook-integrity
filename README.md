@@ -6,10 +6,10 @@ and checks for missing entries and other errors.
 - Parses logbook entries into simple Rust data structures
 - Robust error recovery while parsing - one typo won't prevent the entire file
 from being parsed
+- Generates text using a Markov chain-like algorithm built from entry text
 
 ## Planned additions
 - Generate some interesting statistics - average length and time, subjects, etc
-- Use the content of parsed entries to create a Markov chain
 
 ## Formatting
 ```
