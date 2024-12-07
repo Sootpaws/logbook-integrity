@@ -42,7 +42,7 @@ checksum = "09d6582e104315a817dff97f75133544b2e094ee22447d2acf4a74e189ba06fc"
 
 [[package]]
 name = "logbook-integrity"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "rand",
  "time",
