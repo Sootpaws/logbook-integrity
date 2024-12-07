@@ -1,6 +1,6 @@
 [package]
 name = "logbook-integrity"
-version = "1.0.0"
+version = "1.1.0"
 description = "A command-line tool for parsing and validating journal entries"
 edition = "2021"
 
